@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas width="600" height="400"></canvas>
+    <script>
+        var ListChart = function (ctx) {
+            //获取上下文 画图工具箱
+            this.ctx = ctx || document.querySelector('canvas').getContext('2d');
+            //画布宽度和高度
+            this.canvasHeight = this.ctx.canvas.height;
+            this.canvasWidth = this.ctx.canvas.width;
+            //获取格子距离
+            this.grid = 10;
+            //箭头的大小
+            this.arrow = 10;
+            //坐标距离
+            this.space = 20;
+            //坐标原点
+            this.x0 = this.space;
+            this.y0 = this.canvasHeight - this.space;
+            //点的大小
+            this.dotted = 6;
+
+        }
+        //初始化
+        ListChart.prototype.init = function (data) {
+            this.drawGrid();
+            this.drawAxis();
+            this.drawDotted(data);
+        }
+        //画布
+        ListChart.prototype.drawGrid = function () {
+            //x轴
+            var xGrid = Math.floor(this.canvasHeight / this.grid);
+            this.ctx.strokeStyle = '#eee';
+            for (var i = 0; i <= xGrid; i++) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, i * this.grid - 0.5);
+                this.ctx.lineTo(this.canvasWidth, i * this.grid - 0.5);
+                this.ctx.stroke();
+            }
+            //y轴
+            var yGrid = Math.floor(this.canvasWidth / this.grid);
+            for (var i = 0; i <= yGrid; i++) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(i * this.grid - 0.5, 0);
+                this.ctx.lineTo(i * this.grid - 0.5, this.canvasHeight);
+                this.ctx.stroke();
+            }
+        }
+        //坐标轴
+        ListChart.prototype.drawAxis = function () {
+            //x轴
+            this.ctx.strokeStyle = '#000';
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.x0, this.y0);
+            this.ctx.lineTo(this.canvasWidth - this.space, this.y0);
+            this.ctx.lineTo(this.canvasWidth - this.space - this.grid, this.y0 + this.grid / 2);
+            this.ctx.lineTo(this.canvasWidth - this.space - this.grid, this.y0 - this.grid / 2);
+            this.ctx.lineTo(this.canvasWidth - this.space, this.y0);
+            this.ctx.fill();
+            this.ctx.stroke();
+            //y轴          
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.x0, this.y0);
+            this.ctx.lineTo(this.space, this.space);
+            this.ctx.lineTo(this.space - this.grid / 2, this.space + this.grid);
+            this.ctx.lineTo(this.space + this.grid / 2, this.space + this.grid);
+            this.ctx.lineTo(this.space, this.space);
+            this.ctx.fill();
+            this.ctx.stroke();
+
+        }
+        //坐标点
+        ListChart.prototype.drawDotted = function (data) {
+            var that = this;
+
+            var prevX = 0;
+            var prevY = 0;
+            data.forEach(function (item, i) {
+                //原点
+                var canvasX = that.x0 + item.x;
+                var canvasY = that.y0 - item.y;
+
+                that.ctx.beginPath();
+                that.ctx.moveTo(canvasX - that.dotted / 2, canvasY - that.dotted / 2);
+                that.ctx.lineTo(canvasX + that.dotted / 2, canvasY - that.dotted / 2);
+                that.ctx.lineTo(canvasX + that.dotted / 2, canvasY + that.dotted / 2);
+                that.ctx.lineTo(canvasX - that.dotted / 2, canvasY + that.dotted / 2);
+                that.ctx.closePath();
+                that.ctx.stroke();
+                that.ctx.fill();
+
+                if (i == 0) {
+                    that.ctx.beginPath();
+                    that.ctx.moveTo(that.x0, that.y0);
+                    that.ctx.lineTo(canvasX, canvasY);
+                    that.ctx.stroke();
+                } else {
+                    that.ctx.beginPath();
+                    that.ctx.moveTo(prevX, prevY);
+                    that.ctx.lineTo(canvasX, canvasY);
+                    that.ctx.stroke();
+                }
+                prevX = canvasX;
+                prevY = canvasY;
+            });
+
+        }
+        //数据
+        var data = [
+            {
+                x: 100,
+                y: 120
+            },
+            {
+                x: 200,
+                y: 160
+            },
+            {
+                x: 300,
+                y: 240
+            },
+            {
+                x: 400,
+                y: 120
+            },
+            {
+                x: 500,
+                y: 80
+            }
+        ];
+        var ListChart = new ListChart();
+        ListChart.init(data);
+
+    </script>
+</body>
+
+</html>
